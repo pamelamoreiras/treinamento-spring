@@ -1,8 +1,17 @@
 package com.pamela.spring.domain.entity;
 
+import javax.persistence.*;
+
+@Entity
+@Table (name = "Cliente")
 public class Cliente {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "Id")
     private Integer id;
+
+    @Column(name = "Nome", length = 100)
     private String nome;
 
     public Cliente() {
