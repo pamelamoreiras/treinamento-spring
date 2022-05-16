@@ -11,13 +11,13 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 public class Application {
 
-	@Bean
-	public CommandLineRunner commandLineRunner(@Autowired Clientes clientes){
-		return args -> {
-		Cliente c = new Cliente(null, "fulano");
-		clientes.save(c);
-		};
-	}
+//	@Bean
+//	public CommandLineRunner commandLineRunner(@Autowired Clientes clientes){
+//		return args -> {
+//		Cliente c = new Cliente(null, "fulano");
+//		clientes.save(c);
+//		};
+//	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
