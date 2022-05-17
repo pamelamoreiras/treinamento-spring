@@ -4,10 +4,12 @@ import com.pamela.spring.domain.entity.Cliente;
 import com.pamela.spring.domain.entity.ItemPedido;
 import com.pamela.spring.domain.entity.Pedido;
 import com.pamela.spring.domain.entity.Produto;
+import com.pamela.spring.domain.enums.StatusPedido;
 import com.pamela.spring.domain.repository.Clientes;
 import com.pamela.spring.domain.repository.ItensPedido;
 import com.pamela.spring.domain.repository.Pedidos;
 import com.pamela.spring.domain.repository.Produtos;
+import com.pamela.spring.exception.PedidoNaoEncontradoException;
 import com.pamela.spring.exception.RegraDeNegocioException;
 import com.pamela.spring.rest.dto.ItemPedidoDTO;
 import com.pamela.spring.rest.dto.PedidoDTO;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,6 +46,7 @@ public class PedidoServiceImpl implements PedidoService {
         pedido.setTotal(dto.getTotal());
         pedido.setDataPedido(LocalDate.now());
         pedido.setCliente(cliente);
+        pedido.setStatus(StatusPedido.REALIZADO);
 
         List<ItemPedido> itemPedidos = converterItens(pedido, dto.getItens());
 
@@ -51,6 +55,21 @@ public class PedidoServiceImpl implements PedidoService {
         pedido.setItens(itemPedidos);
 
         return pedido;
+    }
+
+    @Override
+    public Optional<Pedido> obterPedidoCompleto(Integer id) {
+        return pedidosRepository.findByIdFetchItens(id);
+    }
+
+    @Override
+    @Transactional
+    public void atualizaStatus(Integer id, StatusPedido statusPedido) {
+        pedidosRepository.findById(id)
+                .map(pedido -> {
+                    pedido.setStatus(statusPedido);
+                    return pedidosRepository.save(pedido);
+                }).orElseThrow(() -> new PedidoNaoEncontradoException());
     }
 
     private List<ItemPedido> converterItens(Pedido pedido, List<ItemPedidoDTO> itens ) {
